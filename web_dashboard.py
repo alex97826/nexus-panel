@@ -107,19 +107,22 @@ async def logout(request: Request):
 
 @app.get("/callback")
 async def callback(request: Request, code: str):
+    redirect_url = os.getenv("DISCORD_REDIRECT_URI", "https://nexus-panel-l46s.onrender.com/callback")
+    
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": REDIRECT_URI,
+        "redirect_uri": redirect_url,
     }
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     token_resp = requests.post(f"{DISCORD_API_URL}/oauth2/token", data=data, headers=headers).json()
     access_token = token_resp.get("access_token")
 
     if not access_token:
-        return RedirectResponse(url="/")
+        print("Ошибка получения access_token:", token_resp)
+        return RedirectResponse(url="/", status_code=303)
 
     user_resp = requests.get(
         f"{DISCORD_API_URL}/users/@me",
@@ -127,9 +130,8 @@ async def callback(request: Request, code: str):
     ).json()
 
     request.session["user"] = user_resp
-    return RedirectResponse(url="/faq")
-
-
+    return RedirectResponse(url="/faq", status_code=303)
+    
 if __name__ == "__main__":
     import uvicorn
 
