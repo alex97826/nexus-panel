@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus — Главная</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #08080a;
+            --card-bg: rgba(18, 20, 26, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #8b8f9e;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Живой дымчатый фон Notoq */
+        .ambient-stage {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .smoke-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.22;
+            will-change: transform;
+        }
+        .orb-1 {
+            width: 720px;
+            height: 600px;
+            top: -150px;
+            left: 15%;
+            background: radial-gradient(circle, #3d4251 0%, #1c1f28 60%, transparent 85%);
+            animation: drift1 20s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 620px;
+            height: 520px;
+            top: 35%;
+            right: -80px;
+            background: radial-gradient(circle, #2a2e3b 0%, #151821 60%, transparent 85%);
+            animation: drift2 24s ease-in-out infinite alternate;
+        }
+        .orb-3 {
+            width: 680px;
+            height: 580px;
+            bottom: -150px;
+            left: 5%;
+            background: radial-gradient(circle, #323746 0%, #181a22 60%, transparent 85%);
+            animation: drift1 22s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes drift1 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 35px) scale(1.06); }
+            100% { transform: translate(-35px, 60px) scale(0.95); }
+        }
+        @keyframes drift2 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-60px, -35px) scale(1.08); }
+            100% { transform: translate(30px, 45px) scale(0.92); }
+        }
+
+        /* Мягкие световые линии */
+        .ambient-beam {
+            position: absolute;
+            width: 140vw;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 50%, transparent 100%);
+            filter: blur(1px);
+            opacity: 0.45;
+            will-change: transform;
+        }
+        .beam-top {
+            top: 26%;
+            left: -20vw;
+            transform: rotate(-8deg);
+            animation: swayBeam1 16s ease-in-out infinite alternate;
+        }
+        .beam-bottom {
+            top: 70%;
+            left: -10vw;
+            transform: rotate(10deg);
+            animation: swayBeam2 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes swayBeam1 {
+            0% { transform: translateY(0) rotate(-8deg); opacity: 0.3; }
+            50% { transform: translateY(25px) rotate(-5deg); opacity: 0.65; }
+            100% { transform: translateY(-20px) rotate(-10deg); opacity: 0.35; }
+        }
+        @keyframes swayBeam2 {
+            0% { transform: translateY(0) rotate(10deg); opacity: 0.35; }
+            50% { transform: translateY(-30px) rotate(7deg); opacity: 0.7; }
+            100% { transform: translateY(20px) rotate(12deg); opacity: 0.3; }
+        }
+
+        /* Навигационная капсула */
+        .nav-capsule {
+            background: rgba(14, 15, 20, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-tab {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #8b8f9e;
+        }
+        .nav-tab:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .nav-tab-active {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Безопасный логотип без сдвига вкладок */
+        .nexus-brand-text {
+            color: #ffffff;
+            transition: opacity 0.2s ease;
+            display: inline-block;
+        }
+        .nexus-cube-badge {
+            background: linear-gradient(135deg, #272a34 0%, #15171d 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease;
+        }
+        .nexus-brand:hover .nexus-cube-badge {
+            transform: scale(1.08) rotate(-4deg);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Кнопки Notoq */
+        .btn-white-pill {
+            background: #ffffff;
+            color: #060608;
+            box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .btn-white-pill:hover {
+            background: #f1f2f5;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(255, 255, 255, 0.25);
+        }
+        .btn-white-pill:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .btn-dark-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f3f4f6;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+        }
+        .btn-dark-pill:hover {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.22);
+            transform: translateY(-2px);
+        }
+        .btn-dark-pill:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Интерактивные карточки с эффектом подсветки за курсором */
+        .spotlight-card {
+            position: relative;
+            background: rgba(16, 18, 24, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease, background 0.3s ease;
+            overflow: hidden;
+        }
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.06), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .spotlight-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(20, 22, 30, 0.85);
+        }
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative antialiased selection:bg-white selection:text-black">
+
+    <!-- Задний дымчатый фон -->
+    <div class="ambient-stage">
+        <div class="ambient-beam beam-top"></div>
+        <div class="ambient-beam beam-bottom"></div>
+        <div class="smoke-orb orb-1"></div>
+        <div class="smoke-orb orb-2"></div>
+        <div class="smoke-orb orb-3"></div>
+    </div>
+
+    <!-- Шапка -->
+    <header class="sticky top-0 z-50 pt-4 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto h-16 nav-capsule rounded-2xl px-6 flex items-center justify-between shadow-2xl">
+            <div class="flex items-center space-x-8">
+                <a href="/" class="flex items-center space-x-3 group nexus-brand cursor-pointer select-none">
+                    <div class="w-9 h-9 nexus-cube-badge flex items-center justify-center text-white">
+                        <i class="fa-solid fa-cube text-sm text-zinc-200"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight nexus-brand-text">Nexus</span>
+                </a>
+
+                <nav class="hidden md:flex items-center space-x-1.5 text-xs font-medium">
+                    <a href="/" class="nav-tab nav-tab-active px-3.5 py-1.5 rounded-xl" data-i18n="nav_home">Главная</a>
+                    {% if user %}
+                    <a href="/servers" class="nav-tab px-3.5 py-1.5 rounded-xl hover:bg-white/5" data-i18n="nav_panel">Веб-панель</a>
+                    {% endif %}
+                    <a href="/faq" class="nav-tab px-3.5 py-1.5 rounded-xl hover:bg-white/5" data-i18n="nav_faq">FAQ</a>
+                </nav>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Выбор языка -->
+                <div class="relative">
+                    <button id="langBtn" onclick="toggleDropdown('langMenu')" class="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-zinc-300 flex items-center space-x-1.5 hover:border-white/20 transition">
+                        <span id="currentLang">RU</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i>
+                    </button>
+                    <div id="langMenu" class="hidden absolute right-0 mt-2 w-28 bg-[#121318] border border-white/10 rounded-xl shadow-2xl py-1 z-50 text-xs">
+                        <button onclick="setLang('ru')" class="w-full text-left px-3.5 py-2 hover:bg-white/5 text-zinc-300 hover:text-white transition flex items-center justify-between">
+                            <span>Русский</span>
+                            <span>🇷🇺</span>
+                        </button>
+                        <button onclick="setLang('en')" class="w-full text-left px-3.5 py-2 hover:bg-white/5 text-zinc-300 hover:text-white transition flex items-center justify-between">
+                            <span>English</span>
+                            <span>🇬🇧</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Профиль с аккуратной круглой аватаркой без белого ободка -->
+                {% if user %}
+                <div class="flex items-center space-x-3 px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition">
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/20 flex items-center justify-center">
+                        {% if user.avatar %}
+                        <img src="https://cdn.discordapp.com/avatars/{{ user.id }}/{{ user.avatar }}.png?size=128" alt="Avatar" class="w-full h-full object-cover block">
+                        {% else %}
+                        <i class="fa-solid fa-user text-zinc-400 text-xs"></i>
+                        {% endif %}
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <div class="text-xs font-bold text-zinc-200 leading-none mb-1">{{ user.username }}</div>
+                        <a href="/logout" class="text-[10px] text-rose-400 hover:text-rose-300 font-medium leading-none block" data-i18n="logout">Выйти</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="/login" class="btn-white-pill px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2">
+                    <i class="fa-brands fa-discord text-sm"></i>
+                    <span data-i18n="btn_login_ds">Войти</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Главный баннер (Ваш оригинальный текст) -->
+    <section class="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center relative">
+        <div class="inline-flex items-center space-x-2.5 status-badge px-4 py-1.5 rounded-full text-xs font-medium text-zinc-300 mb-8 cursor-default">
+            <i class="fa-solid fa-sparkles text-zinc-400 text-[11px]"></i>
+            <span data-i18n="hero_badge">Мощная экосистема для сообществ</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 max-w-4xl mx-auto leading-[1.15]" data-i18n="hero_title">
+            <span class="text-white">Nexus</span> — автономный модуль нового поколения с глубокой настройкой, быстрым стартом и умным управлением
+        </h1>
+
+        <p class="text-zinc-500 text-xs sm:text-sm uppercase tracking-wider font-semibold max-w-2xl mx-auto mb-8" data-i18n="hero_subtitle_context">
+            Это краткий ответ на вопрос: какое определение можно дать боту Nexus?
+        </p>
+
+        <p class="text-zinc-400 text-sm sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed" data-i18n="hero_desc">
+            Платформа объединяет гибкую систему безопасности, встроенное интерактивное обучение и инструменты автоматизации для Discord.
+        </p>
+
+        <!-- Кнопки: Войти / Веб-панель -->
+        <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            {% if not user %}
+            <a href="/login" class="btn-white-pill w-full sm:w-auto px-7 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center space-x-2">
+                <i class="fa-brands fa-discord text-base mr-1"></i>
+                <span data-i18n="btn_login_ds">Войти</span>
+            </a>
+            {% else %}
+            <a href="/servers" class="btn-white-pill w-full sm:w-auto px-7 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-table-columns text-sm mr-1"></i>
+                <span data-i18n="btn_goto_panel">Перейти в Веб-панель</span>
+            </a>
+            {% endif %}
+
+            <a href="/faq" class="btn-dark-pill w-full sm:w-auto px-7 py-3.5 rounded-xl text-sm font-medium" data-i18n="btn_faq">
+                Перейти в FAQ
+            </a>
+        </div>
+    </section>
+
+    <!-- Особенности (Без двоеточия, карточки в графитовом стиле) -->
+    <section class="max-w-6xl mx-auto px-6 py-16 relative">
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center space-x-2 status-badge px-3.5 py-1.5 rounded-full text-zinc-300 text-xs font-semibold uppercase tracking-wider mb-3">
+                <i class="fa-solid fa-layer-group text-zinc-400"></i>
+                <span data-i18n="section_badge">Преимущества платформы</span>
+            </div>
+            <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white" data-i18n="section_features_title">
+                Особенности
+            </h2>
+            <p class="text-zinc-500 text-xs sm:text-sm mt-2 max-w-lg mx-auto" data-i18n="section_features_sub">
+                Узнайте, почему серверы выбирают Nexus вместо классических решений
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="spotlight-card p-8 rounded-2xl">
+                <div class="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-200 flex items-center justify-center text-lg mb-6">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2.5 tracking-tight" data-i18n="feat1_title">Глубокая настройка</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat1_desc">
+                    Каждый модуль детально кастомизируется под правила конкретного сервера. Никаких жестких рамок — переопределяйте параметры под свои задачи.
+                </p>
+            </div>
+
+            <div class="spotlight-card p-8 rounded-2xl">
+                <div class="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-200 flex items-center justify-center text-lg mb-6">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2.5 tracking-tight" data-i18n="feat2_title">Быстрый старт</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat2_desc">
+                    Используйте готовые шаблоны и запускайте систему безопасности в пару кликов.
+                </p>
+            </div>
+
+            <div class="spotlight-card p-8 rounded-2xl">
+                <div class="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-200 flex items-center justify-center text-lg mb-6">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2.5 tracking-tight" data-i18n="feat3_title">Обучение и гайды</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat3_desc">
+                    Встроенная система подсказок подробно объяснит назначение каждого переключателя.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Возможности бота (Статус: Бета + все иконки на месте) -->
+    <section class="max-w-6xl mx-auto px-6 py-16 relative">
+        <div class="text-center mb-12">
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2" data-i18n="modules_title">
+                Возможности бота
+            </h2>
+            <p class="text-zinc-500 text-xs sm:text-sm max-w-lg mx-auto" data-i18n="modules_sub">
+                Короткие модули, готовые к моментальному включению на вашем сервере
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="cardsGrid">
+            <!-- Модуль 1 -->
+            <div class="spotlight-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300">
+                        <i class="fa-solid fa-shield-halved text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-amber-300/90 bg-amber-400/[0.08] border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span data-i18n="mod_beta">Бета</span>
+                    </span>
+                </div>
+                <h4 class="text-base font-bold text-white mb-1" data-i18n="mod1_title">Авто-модерация</h4>
+                <p class="text-zinc-400 text-xs leading-relaxed" data-i18n="mod1_desc">Защита от спама, нежелательных ссылок, капса и автоматическая выдача мутов.</p>
+            </div>
+
+            <!-- Модуль 2 -->
+            <div class="spotlight-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300">
+                        <i class="fa-solid fa-user-plus text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-amber-300/90 bg-amber-400/[0.08] border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span data-i18n="mod_beta">Бета</span>
+                    </span>
+                </div>
+                <h4 class="text-base font-bold text-white mb-1" data-i18n="mod2_title">Приветствия и роли</h4>
+                <p class="text-zinc-400 text-xs leading-relaxed" data-i18n="mod2_desc">Автоматическая выдача начальных ролей новичкам и отправка красивых карточек.</p>
+            </div>
+
+            <!-- Модуль 3 -->
+            <div class="spotlight-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300">
+                        <i class="fa-solid fa-coins text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-amber-300/90 bg-amber-400/[0.08] border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span data-i18n="mod_beta">Бета</span>
+                    </span>
+                </div>
+                <h4 class="text-base font-bold text-white mb-1" data-i18n="mod3_title">Игровая экономика</h4>
+                <p class="text-zinc-400 text-xs leading-relaxed" data-i18n="mod3_desc">Балансы участников, магазин ролей, ежедневные награды и интерактив.</p>
+            </div>
+
+            <!-- Модуль 4 -->
+            <div class="spotlight-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300">
+                        <i class="fa-solid fa-ticket text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-amber-300/90 bg-amber-400/[0.08] border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span data-i18n="mod_beta">Бета</span>
+                    </span>
+                </div>
+                <h4 class="text-base font-bold text-white mb-1" data-i18n="mod4_title">Тикет-система</h4>
+                <p class="text-zinc-400 text-xs leading-relaxed" data-i18n="mod4_desc">Создание приватных каналов поддержки в один клик по кнопке.</p>
+            </div>
+
+            <!-- Модуль 5 -->
+            <div class="spotlight-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300">
+                        <i class="fa-solid fa-chart-line text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-amber-300/90 bg-amber-400/[0.08] border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span data-i18n="mod_beta">Бета</span>
+                    </span>
+                </div>
+                <h4 class="text-base font-bold text-white mb-1" data-i18n="mod5_title">Уровни и опыт</h4>
+                <p class="text-zinc-400 text-xs leading-relaxed" data-i18n="mod5_desc">Начисление очков за активность в чате и выдача наградных ролей.</p>
+            </div>
+
+            <!-- Модуль 6 -->
+            <div class="spotlight-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-zinc-300">
+                        <i class="fa-solid fa-microphone-lines text-sm"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-amber-300/90 bg-amber-400/[0.08] border border-amber-400/20 px-2.5 py-0.5 rounded-full flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span data-i18n="mod_beta">Бета</span>
+                    </span>
+                </div>
+                <h4 class="text-base font-bold text-white mb-1" data-i18n="mod6_title">Временные войсы</h4>
+                <p class="text-zinc-400 text-xs leading-relaxed" data-i18n="mod6_desc">Создание персональных голосовых каналов при входе с авто-удалением.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="py-8 text-center text-xs text-zinc-600">
+        <p data-i18n="footer_copy">© 2026 Nexus. Все права защищены.</p>
+    </footer>
+
+    <!-- Логика мыши и мультиязычности -->
+    <script>
+        const cards = document.querySelectorAll('.spotlight-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        const translations = {
+            ru: {
+                nav_home: "Главная",
+                nav_panel: "Веб-панель",
+                nav_faq: "FAQ",
+                btn_login_ds: "Войти",
+                logout: "Выйти",
+                hero_badge: "Мощная экосистема для сообществ",
+                hero_title: 'Nexus — автономный модуль нового поколения с глубокой настройкой, быстрым стартом и умным управлением',
+                hero_subtitle_context: "Это краткий ответ на вопрос: какое определение можно дать боту Nexus?",
+                hero_desc: "Платформа объединяет гибкую систему безопасности, встроенное интерактивное обучение и инструменты автоматизации для Discord.",
+                btn_goto_panel: "Перейти в Веб-панель",
+                btn_faq: "Перейти в FAQ",
+                section_badge: "Преимущества платформы",
+                section_features_title: "Особенности",
+                section_features_sub: "Узнайте, почему серверы выбирают Nexus вместо классических решений",
+                feat1_title: "Глубокая настройка",
+                feat1_desc: "Каждый модуль детально кастомизируется под правила конкретного сервера. Никаких жестких рамок — переопределяйте параметры под свои задачи.",
+                feat2_title: "Быстрый старт",
+                feat2_desc: "Используйте готовые шаблоны и запускайте систему безопасности в пару кликов.",
+                feat3_title: "Обучение и гайды",
+                feat3_desc: "Встроенная система подсказок подробно объяснит назначение каждого переключателя.",
+                modules_title: "Возможности бота",
+                modules_sub: "Короткие модули, готовые к моментальному включению на вашем сервере",
+                mod_beta: "Бета",
+                mod1_title: "Авто-модерация",
+                mod1_desc: "Защита от спама, нежелательных ссылок, капса и автоматическая выдача мутов.",
+                mod2_title: "Приветствия и роли",
+                mod2_desc: "Автоматическая выдача начальных ролей новичкам и отправка красивых карточек.",
+                mod3_title: "Игровая экономика",
+                mod3_desc: "Балансы участников, магазин ролей, ежедневные награды и интерактив.",
+                mod4_title: "Тикет-система",
+                mod4_desc: "Создание приватных каналов поддержки в один клик по кнопке.",
+                mod5_title: "Уровни и опыт",
+                mod5_desc: "Начисление очков за активность в чате и выдача наградных ролей.",
+                mod6_title: "Временные войсы",
+                mod6_desc: "Создание персональных голосовых каналов при входе с авто-удалением.",
+                footer_copy: "© 2026 Nexus. Все права защищены."
+            },
+            en: {
+                nav_home: "Home",
+                nav_panel: "Dashboard",
+                nav_faq: "FAQ",
+                btn_login_ds: "Sign In",
+                logout: "Logout",
+                hero_badge: "Powerful Community Ecosystem",
+                hero_title: 'Nexus is a next-generation autonomous module with deep customization, quick start, and smart controls',
+                hero_subtitle_context: "This is the brief answer to: what definition can be given to the Nexus bot?",
+                hero_desc: "The platform brings together configurable security, interactive guides, and community automation for Discord.",
+                btn_goto_panel: "Go to Dashboard",
+                btn_faq: "View FAQ",
+                section_badge: "Platform Benefits",
+                section_features_title: "Features",
+                section_features_sub: "Discover why community servers choose Nexus over traditional bots",
+                feat1_title: "Deep Customization",
+                feat1_desc: "Every module is fine-tuned to match your server rules with no strict limits.",
+                feat2_title: "Quick Start",
+                feat2_desc: "Use ready-made presets and deploy protection in a couple of clicks.",
+                feat3_title: "Guides & Tutorials",
+                feat3_desc: "Integrated helper tooltips explain what every toggle does.",
+                modules_title: "Bot Modules",
+                modules_sub: "Ready-to-use plug-and-play modules for your Discord community",
+                mod_beta: "Beta",
+                mod1_title: "Auto-Moderation",
+                mod1_desc: "Anti-spam, bad link filters, anti-caps and automated mutes.",
+                mod2_title: "Welcome & Roles",
+                mod2_desc: "Automatic autoroles for newcomers and custom rich welcome embed cards.",
+                mod3_title: "Economy System",
+                mod3_desc: "Member balances, custom role shop, daily rewards and mini-games.",
+                mod4_title: "Ticket Support",
+                mod4_desc: "One-click private support channels for direct assistance.",
+                mod5_title: "Levels & XP",
+                mod5_desc: "Activity XP tracker, visual rank cards and reward roles.",
+                mod6_title: "Temp Voice Channels",
+                mod6_desc: "Automatic private voice rooms created on join and deleted when empty.",
+                footer_copy: "© 2026 Nexus. All rights reserved."
+            }
+        };
+
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('#langBtn') && !e.target.closest('#langMenu')) {
+                document.getElementById('langMenu')?.classList.add('hidden');
+            }
+        });
+
+        function setLang(lang) {
+            localStorage.setItem('nexus_lang', lang);
+            document.getElementById('currentLang').innerText = lang.toUpperCase();
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            document.getElementById('langMenu')?.classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('nexus_lang') || 'ru';
+            setLang(savedLang);
+        });
+    </script>
+</body>
+</html>

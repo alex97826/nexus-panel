@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus — FAQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #08080a;
+            --card-bg: rgba(18, 20, 26, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #8b8f9e;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ambient-stage {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .smoke-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.2;
+        }
+        .orb-faq {
+            width: 700px;
+            height: 500px;
+            top: 50px;
+            left: 20%;
+            background: radial-gradient(circle, #383d4c 0%, #171922 60%, transparent 85%);
+        }
+
+        .nav-capsule {
+            background: rgba(14, 15, 20, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-tab {
+            transition: all 0.2s ease;
+            color: #8b8f9e;
+        }
+        .nav-tab:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .nav-tab-active {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nexus-cube-badge {
+            background: linear-gradient(135deg, #272a34 0%, #15171d 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .nexus-brand:hover .nexus-cube-badge {
+            transform: scale(1.08) rotate(-4deg);
+        }
+
+        /* Современный аккордеон Notoq */
+        .faq-item {
+            background: rgba(16, 18, 24, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            transition: all 0.25s ease;
+        }
+        .faq-item:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(20, 22, 30, 0.85);
+        }
+        .faq-arrow {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .faq-item.active .faq-arrow {
+            transform: rotate(180deg);
+            color: #ffffff;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 220px;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative antialiased selection:bg-white selection:text-black">
+
+    <div class="ambient-stage">
+        <div class="smoke-orb orb-faq"></div>
+    </div>
+
+    <!-- Шапка -->
+    <header class="sticky top-0 z-50 pt-4 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto h-16 nav-capsule rounded-2xl px-6 flex items-center justify-between shadow-2xl">
+            <div class="flex items-center space-x-8">
+                <a href="/" class="flex items-center space-x-3 group nexus-brand cursor-pointer select-none">
+                    <div class="w-9 h-9 nexus-cube-badge flex items-center justify-center text-white">
+                        <i class="fa-solid fa-cube text-sm text-zinc-200"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-white">Nexus</span>
+                </a>
+
+                <nav class="hidden md:flex items-center space-x-1.5 text-xs font-medium">
+                    <a href="/" class="nav-tab px-3.5 py-1.5 rounded-xl hover:bg-white/5" data-i18n="nav_home">Главная</a>
+                    {% if user %}
+                    <a href="/servers" class="nav-tab px-3.5 py-1.5 rounded-xl hover:bg-white/5" data-i18n="nav_panel">Веб-панель</a>
+                    {% endif %}
+                    <a href="/faq" class="nav-tab nav-tab-active px-3.5 py-1.5 rounded-xl" data-i18n="nav_faq">FAQ</a>
+                </nav>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <button id="langBtn" onclick="toggleDropdown('langMenu')" class="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-zinc-300 flex items-center space-x-1.5 hover:border-white/20 transition">
+                        <span id="currentLang">RU</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i>
+                    </button>
+                    <div id="langMenu" class="hidden absolute right-0 mt-2 w-28 bg-[#121318] border border-white/10 rounded-xl shadow-2xl py-1 z-50 text-xs">
+                        <button onclick="setLang('ru')" class="w-full text-left px-3.5 py-2 hover:bg-white/5 text-zinc-300 hover:text-white transition flex items-center justify-between">
+                            <span>Русский</span>
+                            <span>🇷🇺</span>
+                        </button>
+                        <button onclick="setLang('en')" class="w-full text-left px-3.5 py-2 hover:bg-white/5 text-zinc-300 hover:text-white transition flex items-center justify-between">
+                            <span>English</span>
+                            <span>🇬🇧</span>
+                        </button>
+                    </div>
+                </div>
+
+                {% if user %}
+                <div class="flex items-center space-x-3 px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition">
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/20 flex items-center justify-center">
+                        {% if user.avatar %}
+                        <img src="https://cdn.discordapp.com/avatars/{{ user.id }}/{{ user.avatar }}.png?size=128" alt="Avatar" class="w-full h-full object-cover block">
+                        {% else %}
+                        <i class="fa-solid fa-user text-zinc-400 text-xs"></i>
+                        {% endif %}
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <div class="text-xs font-bold text-zinc-200 leading-none mb-1">{{ user.username }}</div>
+                        <a href="/logout" class="text-[10px] text-rose-400 hover:text-rose-300 font-medium leading-none block" data-i18n="logout">Выйти</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="/login" class="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 hover:bg-zinc-200 transition">
+                    <i class="fa-brands fa-discord text-sm"></i>
+                    <span data-i18n="btn_login_ds">Войти</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- FAQ Список -->
+    <main class="max-w-3xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight" data-i18n="faq_title">Часто задаваемые вопросы</h1>
+            <p class="text-zinc-500 text-sm" data-i18n="faq_sub">Нажмите на интересующий вопрос, чтобы развернуть ответ</p>
+        </div>
+
+        <div class="space-y-3.5">
+            <!-- Вопрос 1 -->
+            <div class="faq-item rounded-2xl overflow-hidden cursor-pointer select-none" onclick="toggleFaq(this)">
+                <div class="p-6 flex items-center justify-between">
+                    <h3 class="text-sm sm:text-base font-semibold text-white pr-4" data-i18n="faq_q1">Как поставить бота на свой сервер?</h3>
+                    <i class="fa-solid fa-chevron-down faq-arrow text-zinc-500 text-xs"></i>
+                </div>
+                <div class="faq-answer px-6 pb-6">
+                    <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed border-t border-white/[0.06] pt-4" data-i18n="faq_a1">
+                        Пригласите бота через кнопку авторизации, подтвердите права администратора, и Nexus автоматически подключится к серверу.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Вопрос 2 -->
+            <div class="faq-item rounded-2xl overflow-hidden cursor-pointer select-none" onclick="toggleFaq(this)">
+                <div class="p-6 flex items-center justify-between">
+                    <h3 class="text-sm sm:text-base font-semibold text-white pr-4" data-i18n="faq_q2">Какое краткое определение можно дать боту Nexus?</h3>
+                    <i class="fa-solid fa-chevron-down faq-arrow text-zinc-500 text-xs"></i>
+                </div>
+                <div class="faq-answer px-6 pb-6">
+                    <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed border-t border-white/[0.06] pt-4" data-i18n="faq_a2">
+                        Nexus — автономный модуль нового поколения с глубокой кастомизацией, интерактивным обучением и моментальной настройкой через веб-панель.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Вопрос 3 -->
+            <div class="faq-item rounded-2xl overflow-hidden cursor-pointer select-none" onclick="toggleFaq(this)">
+                <div class="p-6 flex items-center justify-between">
+                    <h3 class="text-sm sm:text-base font-semibold text-white pr-4" data-i18n="faq_q3">Бесплатен ли функционал?</h3>
+                    <i class="fa-solid fa-chevron-down faq-arrow text-zinc-500 text-xs"></i>
+                </div>
+                <div class="faq-answer px-6 pb-6">
+                    <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed border-t border-white/[0.06] pt-4" data-i18n="faq_a3">
+                        Базовые модули и функции защиты доступны бесплатно и навсегда без скрытых ограничений.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-8 text-center text-xs text-zinc-600">
+        <p data-i18n="footer_copy">© 2026 Nexus. Все права защищены.</p>
+    </footer>
+
+    <script>
+        function toggleFaq(card) {
+            const isActive = card.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('active'));
+            if (!isActive) {
+                card.classList.add('active');
+            }
+        }
+
+        const translations = {
+            ru: {
+                nav_home: "Главная",
+                nav_panel: "Веб-панель",
+                nav_faq: "FAQ",
+                btn_login_ds: "Войти",
+                logout: "Выйти",
+                faq_title: "Часто задаваемые вопросы",
+                faq_sub: "Нажмите на интересующий вопрос, чтобы развернуть ответ",
+                faq_q1: "Как поставить бота на свой сервер?",
+                faq_a1: "Пригласите бота через кнопку авторизации, подтвердите права администратора, и Nexus автоматически подключится к серверу.",
+                faq_q2: "Какое краткое определение можно дать боту Nexus?",
+                faq_a2: "Nexus — автономный модуль нового поколения с глубокой кастомизацией, интерактивным обучением и моментальной настройкой через веб-панель.",
+                faq_q3: "Бесплатен ли функционал?",
+                faq_a3: "Базовые модули и функции защиты доступны бесплатно и навсегда без скрытых ограничений.",
+                footer_copy: "© 2026 Nexus. Все права защищены."
+            },
+            en: {
+                nav_home: "Home",
+                nav_panel: "Dashboard",
+                nav_faq: "FAQ",
+                btn_login_ds: "Sign In",
+                logout: "Logout",
+                faq_title: "Frequently Asked Questions",
+                faq_sub: "Click on any question below to expand the answer",
+                faq_q1: "How to add the bot to your server?",
+                faq_a1: "Invite the bot via authorization button, grant administrator permissions, and Nexus will automatically connect to your server.",
+                faq_q2: "What is the brief definition of Nexus bot?",
+                faq_a2: "Nexus is a next-generation autonomous module featuring deep customization, interactive guides, and instant web dashboard setup.",
+                faq_q3: "Is the bot free to use?",
+                faq_a3: "Base modules and community protection features are free forever with no hidden restrictions.",
+                footer_copy: "© 2026 Nexus. All rights reserved."
+            }
+        };
+
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('#langBtn') && !e.target.closest('#langMenu')) {
+                document.getElementById('langMenu')?.classList.add('hidden');
+            }
+        });
+
+        function setLang(lang) {
+            localStorage.setItem('nexus_lang', lang);
+            document.getElementById('currentLang').innerText = lang.toUpperCase();
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            document.getElementById('langMenu')?.classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('nexus_lang') || 'ru';
+            setLang(savedLang);
+        });
+    </script>
+</body>
+</html>

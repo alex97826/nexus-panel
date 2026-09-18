@@ -1,0 +1,8 @@
+disnake
+python-dotenv
+fastapi
+uvicorn
+httpx
+python-dotenv
+jinja2
+python-multipart
