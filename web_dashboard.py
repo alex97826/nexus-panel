@@ -78,9 +78,12 @@ async def login():
     if not CLIENT_ID:
         # Режим заглушки для локального тестирования без OAuth2
         return RedirectResponse(url="/mock-login")
+    
+    redirect_url = os.getenv("DISCORD_REDIRECT_URI", "https://nexus-panel-l46s.onrender.com/callback")
+    
     discord_auth_url = (
         f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}&response_type=code&scope=identify%20guilds"
+        f"&redirect_uri={redirect_url}&response_type=code&scope=identify%20guilds"
     )
     return RedirectResponse(url=discord_auth_url)
 
