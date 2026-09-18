@@ -1,8 +1,7 @@
-disnake
-python-dotenv
 fastapi
 uvicorn
 httpx
+requests
 python-dotenv
 jinja2
 python-multipart
